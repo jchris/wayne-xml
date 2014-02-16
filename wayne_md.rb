@@ -87,26 +87,7 @@ def traverse_nav_tree_and_convert_to_xml(node)
   
   when "folder"
 		# do nothing for these
-  when "markdown"
-    metadata, markdown = parse_markdown_file(node.source_path)
-		
-		filepath_markdown = node.source_path.dup		
-		filepath_markdown += ".markdown"	unless filepath_markdown.end_with? (".markdown")		
-		mod.updated_at = Chronic.parse(File.mtime(filepath_markdown).to_s).utc.to_i
-		
-    mod.metadata = metadata if metadata
-    mod.markdown = markdown
-    
-		html = MarkdownRender::render(mod.markdown)
-		doc = Nokogiri::HTML(html) 
-		xml = doc.css('body')[0].serialize #(save_with: 0)
-		xml = Nokogiri::XML(xml)
-		b = xml.at_css "body"
-		b.name = "doc"
-		
-    File.open("#{filepath_markdown.gsub(/.markdown/, ".xml")}", 'w') { |f| xml.write_xml_to f }
-
-  when "folder+markdown"
+  when "markdown", "folder+markdown"
     metadata, markdown = parse_markdown_file(node.source_path)
 		
 		filepath_markdown = node.source_path.dup		
